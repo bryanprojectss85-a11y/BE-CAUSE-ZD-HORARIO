@@ -81,7 +81,7 @@
         function anim(){ ctx.clearRect(0,0,w,h); drops.forEach(d=>{d.draw(); d.update();}); requestAnimationFrame(anim); }
         window.onresize=resize; setup();
 
-        // Lógica
+        // Lógica - UNIFICADO bc_data_v17
         let data = JSON.parse(localStorage.getItem('bc_data_v17')) || [];
         let stats = JSON.parse(localStorage.getItem('bc_stats_v17')) || {};
         let isInside = localStorage.getItem('bc_in_v17') === 'true';
@@ -142,7 +142,9 @@
             }
             data.push({t, ts: now.getTime(), f: keys.dayK, h: now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})});
             isInside = (t==='entrada');
-            localStorage.setItem('bc_db_v17', JSON.stringify(data));
+            
+            // Guardado corregido para que sea persistente
+            localStorage.setItem('bc_data_v17', JSON.stringify(data));
             localStorage.setItem('bc_in_v17', isInside);
             updateUI();
         }
@@ -150,11 +152,13 @@
         function fmt(ms) { const h=Math.floor(ms/3600000); const m=Math.floor((ms%3600000)/60000); return `${h}h ${m}m`; }
         function tick() {
             const n = new Date();
-            document.getElementById('clock').innerText = n.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false});
-            document.getElementById('date-display').innerText = n.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+            const clockEl = document.getElementById('clock');
+            const dateEl = document.getElementById('date-display');
+            if(clockEl) clockEl.innerText = n.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false});
+            if(dateEl) dateEl.innerText = n.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
         }
         setInterval(tick, 1000);
-        function clearHistory() { if(confirm("¿Borrar fichajes?")) { data=[]; stats={}; localStorage.setItem('bc_db_v17','[]'); localStorage.setItem('bc_stats_v17','{}'); updateUI(); } }
+        function clearHistory() { if(confirm("¿Borrar fichajes?")) { data=[]; stats={}; localStorage.setItem('bc_data_v17','[]'); localStorage.setItem('bc_stats_v17','{}'); updateUI(); } }
         function fullReset() { if(confirm("¿RESET TOTAL?")) { localStorage.clear(); location.reload(); } }
         function exportCSV() {
             let csv = "\uFEFFFecha,Accion,Hora\n";
